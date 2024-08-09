@@ -1,3 +1,10 @@
+## Libraries & Frameworks Used
+1. React Native Expo
+2. Expo Navigator
+3. Hugeicons
+
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
