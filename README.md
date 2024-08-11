@@ -1,7 +1,9 @@
-## Libraries & Frameworks Used
+## Tech Stacks and Libraries/Frameworks Used :-
 1. React Native Expo
 2. Expo Navigator
 3. Hugeicons
+4. Supabase 
+5. SQL database from Supabase
 
 
 
