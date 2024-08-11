@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { ActivityIndicator } from 'react-native-web'
+import { ActivityIndicator } from 'react-native' // Fixed typo which caused error. Change: react-native-web to react-native
 
 const Loading = ({size="large", color=theme.color.primary}) => {
   return (

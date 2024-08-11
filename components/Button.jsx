@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { theme } from '../constants/theme'
 import { wp, hp } from '../helpers/common'
-import Loading from './loading'
+import Loading from './Loading' // Fixed typo which caused error. Change: loading from Loading
 
 // I've added this 'export'
 
