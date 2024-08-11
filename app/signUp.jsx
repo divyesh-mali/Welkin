@@ -13,6 +13,12 @@ import { TextInput } from "react-native"; // Fixed typo which caused error. Chan
 import Input from "../components/Input";
 // import { Button } from "react-native"; // DONT IMPORT BUILT IN 'BUTTON' COMPONENT
 import Button from "../components/Button"; // Import our custom 'Button' component for reusability
+import { supabase } from "../lib/supabase";
+
+// Additional Info :-
+// We've created policies in Supabase dashboard, due to which, when users signup they are not automtically added to users table. We created a trigger & function that will help us add the user to the users table when they signup.
+// This is implemented in the supabase backend for security purposes. You can verify this by going in table editor -> users in the supabase dashboard when you signup a new user.
+// Normally we can see users in authentication -> users but we can't see them in the users table. This is because of the policies we've implemented.
 
 const signUp = () => {
   // We're using 'reference' to store login details instead of 'state' because we don't need to re-render the component when the user types in the input field. It actually changes value when the user types every single character & make the component re-render.
@@ -24,12 +30,42 @@ const signUp = () => {
   const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     
     if( !emailRef.current || !passwordRef.current ) {
     Alert.alert("Please fill all the fields");
     return;
   }
+
+  // Refer docs : https://supabase.com/docs/guides/auth/quickstarts/react-native
+
+  let name = nameRef.current.trim()
+  let email = emailRef.current.trim()
+  let password = passwordRef.current.trim()
+
+  setLoading(true)
+
+  const {data: {session}, error} = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      // User management guide: https://supabase.com/docs/guides/auth/managing-user-data
+      data: {
+        name
+      }
+    }
+  });
+  setLoading(false)
+
+
+  // Console statements for debugging purposes :-
+  // console.log('session: ', session);
+  // console.log('error: ', error);
+
+  if(error) {
+    Alert.alert('Sign up ', error.message)
+  }
+  
 }
 
   // else good to go

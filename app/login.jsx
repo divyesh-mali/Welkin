@@ -13,6 +13,7 @@ import { TextInput } from "react-native"; // Fixed typo which caused error. Chan
 import Input from "../components/Input";
 // import { Button } from "react-native"; // DONT IMPORT BUILT IN 'BUTTON' COMPONENT
 import Button from "../components/Button"; // Import our custom 'Button' component for reusability
+import { supabase } from "../lib/supabase";
 
 const login = () => {
   // We're using 'reference' to store login details instead of 'state' because we don't need to re-render the component when the user types in the input field. It actually changes value when the user types every single character & make the component re-render.
@@ -23,15 +24,28 @@ const login = () => {
   const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     
     if( !emailRef.current || !passwordRef.current ) {
     Alert.alert("Please fill all the fields");
     return;
   }
-}
 
-  // else good to go
+  let email = emailRef.current.trim()
+  let password = passwordRef.current.trim()
+  setLoading(true)
+  const {error} = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  setLoading(false)
+
+  console.log('error: ', error)
+  if(error) {
+    Alert.alert('Login ', error.message)
+  }
+}
 
   return (
     <ScreenWrapper bg="white">
