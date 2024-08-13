@@ -23,13 +23,14 @@ const MainLayout = () => {
   // Refer docs : https://supabase.com/docs/guides/auth/quickstarts/react-native
   useEffect( () => {
     supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('session user: ', session?.user?.id);
+      // console.log('session user: ', session?.user?.id);
 
       if(session) {
         // set auth
         // move to home screen
         setAuth(session?.user)
-        updateUserData(session?.user)
+        updateUserData(session?.user, session?.user?.email)
+        // console.log('auth user: ', session?.user?.email);
         router.replace('/home') // here we are replacing the screen with home screen so that user can't go back to login/welcome screen and won't have to login again
       }
 
@@ -43,11 +44,11 @@ const MainLayout = () => {
     })
   }, []) // Here, once I forgot to add the empty array, and it caused the useEffect to run infinitely. So, always remember to add the empty array to avoid infinite loop.
 
-  const updateUserData = async (user) => {
+  const updateUserData = async (user, email) => {
     // Getting response from the API defined/called in : ..\services\userServices.js
     let res = await getUserData(user?.id)
     // console.log('got user data: ', res); // For debugging purposes
-    if(res.success) setUserData(res.data) // It doesn't make any difference if we use this function or setAuth function to set the user data. Both will work fine.
+    if(res.success) setUserData({...res.data, email}) // It doesn't make any difference if we use this function or setAuth function to set the user data. Both will work fine.
     
   }
 
