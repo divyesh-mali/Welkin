@@ -21,6 +21,8 @@ import Delete from './Delete';
 import Logout from './logout';
 import Video from './Video';
 import Image from './Image';
+import Location from './Location';
+
 
 const icons = {
     home: Home,
@@ -43,6 +45,7 @@ const icons = {
     logout: Logout,
     image: Image,
     video: Video,
+    location: Location,
 }
 
 // I added this export beacuse I was getting an error
