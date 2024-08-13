@@ -10,6 +10,8 @@ const setAuth = authUser =>{
 }
 
 const setUserData = userData => { 
+    // console.log('old user:', user);
+    
     setUser({...userData})
 };
     return (
