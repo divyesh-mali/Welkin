@@ -1,12 +1,22 @@
+import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
+import { supabase } from './../lib/supabase';
+import { supabaseUrl } from './../constants/index';
 
 export const getUserImageSrc = imagePath => {
     if(imagePath) {
-        return {uri: imagePath}
+        return getSupabaseFileUrl(imagePath)
     }
     
     else {
         return require('../assets/images/defaultUser.png')
+    }
+}
+
+export const getSupabaseFileUrl = filePath => {
+    if(filePath) {
+        // The part of this url before '/storage....' is same as which we had set as 'supabaseUrl'
+        return {uri: `${supabaseUrl}/storage/v1/object/public/uploads/${filePath}`}
     }
 }
 
@@ -15,10 +25,31 @@ export const uploadFile = async (folderName, fileUri, isImage = true) => {
     try {
         let fileName = getFilePath(folderName, isImage);
         const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
-
+            encoding: FileSystem.EncodingType.Base64
         });
 
-        // let imageData = decode to array buffer
+        // For conversion of base64 to ArrayBuffer we've used 'base64-arraybuffer' library
+        let imageData = decode(fileBase64); // ArrayBuffer
+        // After this conversion you can upload it to Supabase storage
+        // Refer docs: https://supabase.com/docs/reference/javascript/storage-from-upload
+
+        let {data, error} = await supabase
+        .storage
+        .from('uploads') // Name of the bucket
+        .upload(fileName, imageData, {
+            cacheControl: '3600', // 1 hour
+            upsert: false, // If file exists, do not overwrite
+            contentType: isImage ? 'image/*' : 'video/*'
+        });
+
+        if(error) {
+            console.log('File upload error: ', error);
+            return {success: false, msg: 'Could not upload media'}
+        }
+
+        // console.log('data: ', data); // For debugging purpose
+        return {success: true, data: data.path}
+        
 
     }
 
@@ -30,9 +61,12 @@ export const uploadFile = async (folderName, fileUri, isImage = true) => {
 }
 
 export const getFilePath = (folderName, isImage) => {
-    return `/${folderName}/${(new Date()).getTime()}$(isImage ? '.png': '.mp4')`
+    return `/${folderName}/${(new Date()).getTime()}${isImage? '.png': '.mp4'}`
     // If you're uploading in a folder named 'profile', the file name will be profile/163123456789.png
     // If you're uploading in a folder named 'posts', the file name will be images/163123456789.png
+    // Refer the console logs to see the file path after uploading the image
+
+    
 
     // Refer docs: https://supabase.com/docs/reference/javascript/storage-emptybucket
     // " For React Native, using either Blob, File or FormData does not work as intended. Upload file using ArrayBuffer from base64 file data instead, see example below. 
