@@ -12,7 +12,8 @@ import Input from "../../components/Input";
 import { Button } from "../../components/Button"; // Fixed typo which caused error. Change: react-native to react-native-web. Error: Text string must be rendered within a <Text> component.
 import { Alert } from "react-native";
 import { updateUser } from "../../services/userServices";
-import { router, useRouter } from 'expo-router';
+import { router, useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfile = () => {
   const { user: currentUser, setUserData } = useAuth();
@@ -39,29 +40,46 @@ const EditProfile = () => {
     }
   }, [currentUser]);
 
-  const onPickImage = () => {};
+  // Refer ImagePicker docs: https://docs.expo.dev/versions/latest/sdk/imagepicker/
+  const onPickImage = async () => {
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Changed this from '.All' to '.Images' to allow only images
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7, // Just set this value from 1 to 0.7 to reduce the image size for large images
+    });
+    if(!result.canceled) {
+      setUser({...user, image: result.assets[0]})
+    }
+  }
+
 
   const onSubmit = async () => {
-    let userData = {...user};
-    let {name, phoneNumber, address, image, bio} = userData;
-    if (!name || !phoneNumber || !address || !bio) {
-      Alert.alert('Profile', "Please fill all the fields");
+    let userData = { ...user };
+    let { name, phoneNumber, address, image, bio } = userData;
+    if (!name || !phoneNumber || !address || !bio || !image) {
+      Alert.alert("Profile", "Please fill all the fields");
       return;
     }
     setLoading(true);
+
+    if(typeof image == 'object') {
+      // upload image
+    }
+
     // update user
     const res = await updateUser(currentUser?.id, userData);
     setLoading(false); // This is used to stop loading after the data is updated
 
     // console.log("update user result: ", res); // For debugging purpose
-    if(res.success) {
-      setUserData({...currentUser, ...userData});
+    if (res.success) {
+      setUserData({ ...currentUser, ...userData });
       router.back();
     }
-    
-  }
+  };
 
-  let imageSource = getUserImageSrc(user.image);
+  let imageSource = user.image && typeof user.image =='object' ? user.image.uri : getUserImageSrc(user.image);
   return (
     <ScreenWrapper bg="white">
       <View style={styles.container}>
@@ -85,21 +103,21 @@ const EditProfile = () => {
               icon={<Icon name="user" />}
               placeholder="Enter your name"
               value={user.name}
-              onChangeText={value => setUser({...user, name: value})}
+              onChangeText={(value) => setUser({ ...user, name: value })} // https://chatgpt.com/share/8fb4122c-6533-4ab9-b3ee-3c7fdcced467
             />
 
             <Input
               icon={<Icon name="call" />}
               placeholder="Enter your phone number"
               value={user.phoneNumber}
-              onChangeText={value => setUser({...user, phoneNumber: value})}
-            /> 
+              onChangeText={(value) => setUser({ ...user, phoneNumber: value })}
+            />
 
             <Input
               icon={<Icon name="location" />}
               placeholder="Enter your address"
               value={user.address}
-              onChangeText={value => setUser({...user, address: value})}
+              onChangeText={(value) => setUser({ ...user, address: value })}
             />
 
             <Input
@@ -107,11 +125,10 @@ const EditProfile = () => {
               value={user.bio}
               multiline={true}
               containerStyle={styles.bio}
-              onChangeText={value => setUser({...user, bio: value})}
+              onChangeText={(value) => setUser({ ...user, bio: value })}
             />
 
             <Button title="Update" loading={loading} onPress={onSubmit} />
-
           </View>
         </ScrollView>
       </View>
