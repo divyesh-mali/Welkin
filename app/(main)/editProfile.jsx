@@ -7,9 +7,9 @@ import { Image } from "expo-image";
 import Icon from "../../assets/icons";
 import Header from "../../components/Header";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserImageSrc } from "../../services/imageServices";
+import { getUserImageSrc, uploadFile } from "../../services/imageServices";
 import Input from "../../components/Input";
-import { Button } from "../../components/Button"; // Fixed typo which caused error. Change: react-native to react-native-web. Error: Text string must be rendered within a <Text> component.
+import { Button } from "../../components/Button"; // Fixed typo which caused error. Change: react-native-web to react-native. Error: Text string must be rendered within a <Text> component.
 import { Alert } from "react-native";
 import { updateUser } from "../../services/userServices";
 import { router, useRouter } from "expo-router";
@@ -66,6 +66,9 @@ const EditProfile = () => {
 
     if(typeof image == 'object') {
       // upload image
+      let imageRes = await uploadFile('profiles', image?.uri, true);
+      if(imageRes.success) userData.image = imageRes.data;
+      else userData.image = null;
     }
 
     // update user
