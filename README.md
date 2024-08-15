@@ -7,6 +7,7 @@
 5. PostgreSQL database from Supabase
 7. Expo Image (to display various images)
 6. Expo ImagePicker (to pick image from gallery for setting profile picture)
+7. Expo File System && Base64 Array Buffer (to convert images to base64 format in order to upload them on Supabase)
 
 --------------------------------------
 
